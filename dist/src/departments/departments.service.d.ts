@@ -11,113 +11,113 @@ export declare class DepartmentsService {
         users: ({
             user: {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
                 username: string;
                 email: string;
                 profileImage: string | null;
                 age: number | null;
                 location: string | null;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string;
             departmentId: string;
+            userId: string;
         })[];
     } & {
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         departmentName: string;
         rules: Prisma.JsonValue;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     findAll(): Prisma.PrismaPromise<({
         users: ({
             user: {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
                 username: string;
                 email: string;
                 profileImage: string | null;
                 age: number | null;
                 location: string | null;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string;
             departmentId: string;
+            userId: string;
         })[];
     } & {
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         departmentName: string;
         rules: Prisma.JsonValue;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     })[]>;
     findOne(id: string): Promise<{
         users: ({
             user: {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
                 username: string;
                 email: string;
                 profileImage: string | null;
                 age: number | null;
                 location: string | null;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string;
             departmentId: string;
+            userId: string;
         })[];
     } & {
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         departmentName: string;
         rules: Prisma.JsonValue;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     update(id: string, dto: UpdateDepartmentDto, file?: Express.Multer.File): Promise<{
         users: ({
             user: {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
                 username: string;
                 email: string;
                 profileImage: string | null;
                 age: number | null;
                 location: string | null;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string;
             departmentId: string;
+            userId: string;
         })[];
     } & {
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         departmentName: string;
         rules: Prisma.JsonValue;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     remove(id: string): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         departmentName: string;
         rules: Prisma.JsonValue;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     private includeUsers;
 }

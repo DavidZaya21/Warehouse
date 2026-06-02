@@ -7,4 +7,6 @@ export declare class StorageService {
     constructor(config: ConfigService);
     uploadImage(file: Express.Multer.File, folder: string): Promise<string>;
     private required;
+    private requiredAny;
+    private getEndpoint;
 }

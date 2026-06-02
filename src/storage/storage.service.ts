@@ -11,12 +11,12 @@ export class StorageService {
   private readonly client: S3Client;
 
   constructor(private readonly config: ConfigService) {
-    const accountId = this.required('R2_ACCOUNT_ID');
-    this.bucket = this.required('R2_BUCKET');
+    const endpoint = this.getEndpoint();
+    this.bucket = this.requiredAny(['R2_BUCKET', 'R2_BUCKET_NAME']);
     this.publicUrl = this.config.get<string>('R2_PUBLIC_URL');
     this.client = new S3Client({
       region: 'auto',
-      endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+      endpoint,
       credentials: {
         accessKeyId: this.required('R2_ACCESS_KEY_ID'),
         secretAccessKey: this.required('R2_SECRET_ACCESS_KEY'),
@@ -48,5 +48,26 @@ export class StorageService {
       throw new Error(`${name} is required`);
     }
     return value;
+  }
+
+  private requiredAny(names: string[]) {
+    for (const name of names) {
+      const value = this.config.get<string>(name);
+      if (value) {
+        return value;
+      }
+    }
+
+    throw new Error(`${names.join(' or ')} is required`);
+  }
+
+  private getEndpoint() {
+    const endpoint = this.config.get<string>('R2_ENDPOINT');
+    if (endpoint) {
+      return endpoint;
+    }
+
+    const accountId = this.required('R2_ACCOUNT_ID');
+    return `https://${accountId}.r2.cloudflarestorage.com`;
   }
 }

@@ -18,12 +18,12 @@ const path_1 = require("path");
 let StorageService = class StorageService {
     constructor(config) {
         this.config = config;
-        const accountId = this.required('R2_ACCOUNT_ID');
-        this.bucket = this.required('R2_BUCKET');
+        const endpoint = this.getEndpoint();
+        this.bucket = this.requiredAny(['R2_BUCKET', 'R2_BUCKET_NAME']);
         this.publicUrl = this.config.get('R2_PUBLIC_URL');
         this.client = new client_s3_1.S3Client({
             region: 'auto',
-            endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+            endpoint,
             credentials: {
                 accessKeyId: this.required('R2_ACCESS_KEY_ID'),
                 secretAccessKey: this.required('R2_SECRET_ACCESS_KEY'),
@@ -49,6 +49,23 @@ let StorageService = class StorageService {
             throw new Error(`${name} is required`);
         }
         return value;
+    }
+    requiredAny(names) {
+        for (const name of names) {
+            const value = this.config.get(name);
+            if (value) {
+                return value;
+            }
+        }
+        throw new Error(`${names.join(' or ')} is required`);
+    }
+    getEndpoint() {
+        const endpoint = this.config.get('R2_ENDPOINT');
+        if (endpoint) {
+            return endpoint;
+        }
+        const accountId = this.required('R2_ACCOUNT_ID');
+        return `https://${accountId}.r2.cloudflarestorage.com`;
     }
 };
 exports.StorageService = StorageService;
