@@ -6,7 +6,9 @@ export declare class StorageService {
     private readonly client;
     constructor(config: ConfigService);
     uploadImage(file: Express.Multer.File, folder: string): Promise<string>;
+    deleteImage(imageReference?: string | null): Promise<void>;
     private required;
     private requiredAny;
     private getEndpoint;
+    private getObjectKey;
 }

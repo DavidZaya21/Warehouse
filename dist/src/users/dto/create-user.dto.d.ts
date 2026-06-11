@@ -3,5 +3,5 @@ export declare class CreateUserDto {
     email: string;
     age?: number;
     location?: string;
-    departmentIds?: string[];
+    departmentNames?: string[];
 }

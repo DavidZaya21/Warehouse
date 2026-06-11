@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsEmail,
@@ -9,30 +9,45 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsString()
   username: string;
 
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsEmail()
   email: string;
 
   @IsOptional()
-  @Type(() => Number)
+  @Transform(({ value }) => optionalNumber(value))
   @IsInt()
   @Min(0)
   age?: number;
 
   @IsOptional()
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsString()
   location?: string;
 
   @IsOptional()
-  @Transform(({ value }) => normalizeDepartmentIds(value))
+  @Transform(({ value }) => normalizeStringList(value))
   @IsArray()
   @IsString({ each: true })
-  departmentIds?: string[];
+  departmentNames?: string[];
 }
 
-function normalizeDepartmentIds(value: unknown) {
+function emptyStringToUndefined(value: unknown) {
+  return value === '' ? undefined : value;
+}
+
+function optionalNumber(value: unknown) {
+  if (value === '' || value === undefined || value === null) {
+    return undefined;
+  }
+
+  return Number(value);
+}
+
+function normalizeStringList(value: unknown) {
   if (!value) {
     return undefined;
   }
@@ -51,7 +66,7 @@ function normalizeDepartmentIds(value: unknown) {
   } catch {
     return value
       .split(',')
-      .map((id) => id.trim())
+      .map((item) => item.trim())
       .filter(Boolean);
   }
 }

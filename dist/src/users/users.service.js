@@ -19,6 +19,7 @@ let UsersService = class UsersService {
         this.storage = storage;
     }
     async create(dto, file) {
+        const departmentIds = await this.resolveDepartmentIds(dto);
         const profileImage = file
             ? await this.storage.uploadImage(file, 'users')
             : undefined;
@@ -29,9 +30,9 @@ let UsersService = class UsersService {
                 age: dto.age,
                 location: dto.location,
                 profileImage,
-                departments: dto.departmentIds?.length
+                departments: departmentIds.length
                     ? {
-                        create: dto.departmentIds.map((departmentId) => ({
+                        create: departmentIds.map((departmentId) => ({
                             department: { connect: { id: departmentId } },
                         })),
                     }
@@ -57,11 +58,13 @@ let UsersService = class UsersService {
         return user;
     }
     async update(id, dto, file) {
-        await this.findOne(id);
+        const existingUser = await this.findOne(id);
+        const departmentIds = await this.resolveDepartmentIds(dto);
+        const shouldUpdateDepartments = dto.departmentNames !== undefined;
         const profileImage = file
             ? await this.storage.uploadImage(file, 'users')
             : undefined;
-        return this.prisma.user.update({
+        const updatedUser = await this.prisma.user.update({
             where: { id },
             data: {
                 username: dto.username,
@@ -69,10 +72,10 @@ let UsersService = class UsersService {
                 age: dto.age,
                 location: dto.location,
                 profileImage,
-                departments: dto.departmentIds
+                departments: shouldUpdateDepartments
                     ? {
                         deleteMany: {},
-                        create: dto.departmentIds.map((departmentId) => ({
+                        create: departmentIds.map((departmentId) => ({
                             department: { connect: { id: departmentId } },
                         })),
                     }
@@ -80,10 +83,16 @@ let UsersService = class UsersService {
             },
             include: this.includeDepartments(),
         });
+        if (file) {
+            await this.storage.deleteImage(existingUser.profileImage);
+        }
+        return updatedUser;
     }
     async remove(id) {
-        await this.findOne(id);
-        return this.prisma.user.delete({ where: { id } });
+        const existingUser = await this.findOne(id);
+        const deletedUser = await this.prisma.user.delete({ where: { id } });
+        await this.storage.deleteImage(existingUser.profileImage);
+        return deletedUser;
     }
     async addDepartment(userId, departmentId) {
         await this.findOne(userId);
@@ -108,6 +117,27 @@ let UsersService = class UsersService {
                 },
             },
         };
+    }
+    async resolveDepartmentIds(dto) {
+        const departmentNames = dto.departmentNames ?? [];
+        if (!departmentNames.length) {
+            return [];
+        }
+        const departments = await this.prisma.department.findMany({
+            where: {
+                departmentName: { in: departmentNames },
+            },
+            select: {
+                id: true,
+                departmentName: true,
+            },
+        });
+        const foundNames = new Set(departments.map((department) => department.departmentName));
+        const missingNames = departmentNames.filter((name) => !foundNames.has(name));
+        if (missingNames.length) {
+            throw new common_1.NotFoundException(`Department not found: ${missingNames.join(', ')}`);
+        }
+        return [...new Set(departments.map((department) => department.id))];
     }
 };
 exports.UsersService = UsersService;

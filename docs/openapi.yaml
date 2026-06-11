@@ -1,0 +1,533 @@
+openapi: 3.0.3
+info:
+  title: Warehouse API
+  version: 1.0.0
+  description: REST API specification for users, departments, memberships, and image uploads.
+servers:
+  - url: http://localhost:3000
+    description: Local development
+tags:
+  - name: Users
+  - name: Departments
+paths:
+  /users:
+    post:
+      tags: [Users]
+      summary: Create a user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserCreateForm"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Users]
+      summary: List users
+      operationId: listUsers
+      responses:
+        "200":
+          description: Users returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Get a user by id
+      operationId: getUserById
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Users]
+      summary: Update a user
+      operationId: updateUserById
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserUpdateForm"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Users]
+      summary: Delete a user
+      operationId: deleteUserById
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /users/{id}/departments/{departmentId}:
+    post:
+      tags: [Users]
+      summary: Add a user to a department
+      operationId: addUserDepartment
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+        - $ref: "#/components/parameters/DepartmentIdPath"
+      responses:
+        "201":
+          description: Membership created or returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDepartment"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Users]
+      summary: Remove a user from a department
+      operationId: removeUserDepartment
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+        - $ref: "#/components/parameters/DepartmentIdPath"
+      responses:
+        "200":
+          description: Membership removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDepartment"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /departments:
+    post:
+      tags: [Departments]
+      summary: Create a department
+      operationId: createDepartment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DepartmentCreateForm"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepartmentCreateRequest"
+      responses:
+        "201":
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Departments]
+      summary: List departments
+      operationId: listDepartments
+      responses:
+        "200":
+          description: Departments returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
+
+  /departments/{id}:
+    get:
+      tags: [Departments]
+      summary: Get a department by id
+      operationId: getDepartmentById
+      parameters:
+        - $ref: "#/components/parameters/DepartmentIdPath"
+      responses:
+        "200":
+          description: Department returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Departments]
+      summary: Update a department
+      operationId: updateDepartmentById
+      parameters:
+        - $ref: "#/components/parameters/DepartmentIdPath"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DepartmentUpdateForm"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepartmentUpdateRequest"
+      responses:
+        "200":
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Departments]
+      summary: Delete a department
+      operationId: deleteDepartmentById
+      parameters:
+        - $ref: "#/components/parameters/DepartmentIdPath"
+      responses:
+        "200":
+          description: Department deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    UserIdPath:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: User id
+    DepartmentIdPath:
+      in: path
+      name: departmentId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Department id
+
+  responses:
+    BadRequest:
+      description: Invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Resource conflicts with existing data
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    UserCreateRequest:
+      type: object
+      required: [username, email]
+      properties:
+        username:
+          type: string
+          example: alex
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        age:
+          type: integer
+          minimum: 0
+          example: 28
+        location:
+          type: string
+          example: Warsaw
+        departmentNames:
+          type: array
+          description: Existing department names to connect to this user.
+          items:
+            type: string
+          example: [Operations, Design]
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: ""
+        email:
+          type: string
+          format: email
+          example: ""
+        age:
+          type: string
+          description: Optional integer value. Leave blank to keep the current age.
+          example: ""
+        location:
+          type: string
+          example: ""
+        departmentNames:
+          type: array
+          description: Existing department names to replace this user's department memberships.
+          items:
+            type: string
+          example: []
+    UserCreateForm:
+      allOf:
+        - $ref: "#/components/schemas/UserCreateRequest"
+        - type: object
+          properties:
+            profileImage:
+              type: string
+              format: binary
+            departmentNames:
+              type: string
+              description: JSON array string or comma-separated existing department names
+              example: '["Operations","Design"]'
+    UserUpdateForm:
+      type: object
+      properties:
+        username:
+          type: string
+          example: ""
+        email:
+          type: string
+          format: email
+          example: ""
+        age:
+          type: string
+          description: Optional integer value. Leave blank to keep the current age.
+          example: ""
+        location:
+          type: string
+          example: ""
+        departmentNames:
+          type: string
+          description: JSON array string or comma-separated existing department names. Replaces the user's department memberships when sent.
+          example: ""
+        profileImage:
+          type: string
+          format: binary
+
+    DepartmentCreateRequest:
+      type: object
+      required: [departmentName]
+      properties:
+        departmentName:
+          type: string
+          example: Operations
+        rules:
+          type: object
+          additionalProperties: true
+          example:
+            canInvite: true
+            maxMembers: 25
+    DepartmentUpdateRequest:
+      type: object
+      properties:
+        departmentName:
+          type: string
+          example: ""
+        rules:
+          type: object
+          additionalProperties: true
+          example: {}
+    DepartmentCreateForm:
+      allOf:
+        - $ref: "#/components/schemas/DepartmentCreateRequest"
+        - type: object
+          properties:
+            image:
+              type: string
+              format: binary
+            rules:
+              type: string
+              description: JSON object string
+              example: '{"canInvite":true,"maxMembers":25}'
+    DepartmentUpdateForm:
+      type: object
+      properties:
+        departmentName:
+          type: string
+          example: ""
+        rules:
+          type: string
+          description: JSON object string
+          example: ""
+        image:
+          type: string
+          format: binary
+
+    User:
+      type: object
+      required: [id, username, email, departments, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        profileImage:
+          type: string
+          nullable: true
+        age:
+          type: integer
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        departments:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDepartment"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Department:
+      type: object
+      required: [id, departmentName, rules, users, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        departmentName:
+          type: string
+        rules:
+          type: object
+          additionalProperties: true
+        imageUrl:
+          type: string
+          nullable: true
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDepartment"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserDepartment:
+      type: object
+      required: [id, userId, departmentId, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        departmentId:
+          type: string
+          format: uuid
+        user:
+          $ref: "#/components/schemas/UserSummary"
+        department:
+          $ref: "#/components/schemas/DepartmentSummary"
+        createdAt:
+          type: string
+          format: date-time
+
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+
+    DepartmentSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        departmentName:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [statusCode, message]
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        message:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        error:
+          type: string
+          example: Bad Request

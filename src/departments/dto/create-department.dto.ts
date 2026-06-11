@@ -2,6 +2,7 @@ import { Transform } from 'class-transformer';
 import { IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateDepartmentDto {
+  @Transform(({ value }) => emptyStringToUndefined(value))
   @IsString()
   departmentName: string;
 
@@ -9,6 +10,10 @@ export class CreateDepartmentDto {
   @Transform(({ value }) => parseRules(value))
   @IsObject()
   rules?: Record<string, unknown>;
+}
+
+function emptyStringToUndefined(value: unknown) {
+  return value === '' ? undefined : value;
 }
 
 function parseRules(value: unknown) {

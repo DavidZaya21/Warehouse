@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
@@ -42,6 +46,20 @@ export class StorageService {
       : key;
   }
 
+  async deleteImage(imageReference?: string | null) {
+    const key = this.getObjectKey(imageReference);
+    if (!key) {
+      return;
+    }
+
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      }),
+    );
+  }
+
   private required(name: string) {
     const value = this.config.get<string>(name);
     if (!value) {
@@ -69,5 +87,29 @@ export class StorageService {
 
     const accountId = this.required('R2_ACCOUNT_ID');
     return `https://${accountId}.r2.cloudflarestorage.com`;
+  }
+
+  private getObjectKey(imageReference?: string | null) {
+    if (!imageReference) {
+      return undefined;
+    }
+
+    if (!imageReference.startsWith('http')) {
+      return imageReference.replace(/^\/+/, '');
+    }
+
+    if (this.publicUrl) {
+      const baseUrl = this.publicUrl.replace(/\/$/, '');
+      if (imageReference.startsWith(`${baseUrl}/`)) {
+        return imageReference.slice(baseUrl.length + 1);
+      }
+    }
+
+    try {
+      const url = new URL(imageReference);
+      return url.pathname.replace(/^\/+/, '');
+    } catch {
+      return undefined;
+    }
   }
 }

@@ -52,13 +52,13 @@ export class DepartmentsService {
     dto: UpdateDepartmentDto,
     file?: Express.Multer.File,
   ) {
-    await this.findOne(id);
+    const existingDepartment = await this.findOne(id);
 
     const imageUrl = file
       ? await this.storage.uploadImage(file, 'departments')
       : undefined;
 
-    return this.prisma.department.update({
+    const updatedDepartment = await this.prisma.department.update({
       where: { id },
       data: {
         departmentName: dto.departmentName,
@@ -67,11 +67,23 @@ export class DepartmentsService {
       },
       include: this.includeUsers(),
     });
+
+    if (file) {
+      await this.storage.deleteImage(existingDepartment.imageUrl);
+    }
+
+    return updatedDepartment;
   }
 
   async remove(id: string) {
-    await this.findOne(id);
-    return this.prisma.department.delete({ where: { id } });
+    const existingDepartment = await this.findOne(id);
+    const deletedDepartment = await this.prisma.department.delete({
+      where: { id },
+    });
+
+    await this.storage.deleteImage(existingDepartment.imageUrl);
+
+    return deletedDepartment;
   }
 
   private includeUsers() {

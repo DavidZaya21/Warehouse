@@ -43,6 +43,16 @@ let StorageService = class StorageService {
             ? `${this.publicUrl.replace(/\/$/, '')}/${key}`
             : key;
     }
+    async deleteImage(imageReference) {
+        const key = this.getObjectKey(imageReference);
+        if (!key) {
+            return;
+        }
+        await this.client.send(new client_s3_1.DeleteObjectCommand({
+            Bucket: this.bucket,
+            Key: key,
+        }));
+    }
     required(name) {
         const value = this.config.get(name);
         if (!value) {
@@ -66,6 +76,27 @@ let StorageService = class StorageService {
         }
         const accountId = this.required('R2_ACCOUNT_ID');
         return `https://${accountId}.r2.cloudflarestorage.com`;
+    }
+    getObjectKey(imageReference) {
+        if (!imageReference) {
+            return undefined;
+        }
+        if (!imageReference.startsWith('http')) {
+            return imageReference.replace(/^\/+/, '');
+        }
+        if (this.publicUrl) {
+            const baseUrl = this.publicUrl.replace(/\/$/, '');
+            if (imageReference.startsWith(`${baseUrl}/`)) {
+                return imageReference.slice(baseUrl.length + 1);
+            }
+        }
+        try {
+            const url = new URL(imageReference);
+            return url.pathname.replace(/^\/+/, '');
+        }
+        catch {
+            return undefined;
+        }
     }
 };
 exports.StorageService = StorageService;

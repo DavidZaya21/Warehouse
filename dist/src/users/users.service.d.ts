@@ -152,4 +152,5 @@ export declare class UsersService {
         userId: string;
     }>;
     private includeDepartments;
+    private resolveDepartmentIds;
 }

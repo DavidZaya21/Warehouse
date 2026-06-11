@@ -16,6 +16,7 @@ class CreateDepartmentDto {
 }
 exports.CreateDepartmentDto = CreateDepartmentDto;
 __decorate([
+    (0, class_transformer_1.Transform)(({ value }) => emptyStringToUndefined(value)),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateDepartmentDto.prototype, "departmentName", void 0);
@@ -25,6 +26,9 @@ __decorate([
     (0, class_validator_1.IsObject)(),
     __metadata("design:type", Object)
 ], CreateDepartmentDto.prototype, "rules", void 0);
+function emptyStringToUndefined(value) {
+    return value === '' ? undefined : value;
+}
 function parseRules(value) {
     if (!value || typeof value !== 'string') {
         return value;
